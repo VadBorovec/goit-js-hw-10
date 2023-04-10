@@ -19,7 +19,7 @@ function createCardMarkup(data) {
   return data.map(
     ({ name, capital, population, flags, languages }) =>
       `<div class="card">
-        <div class="card-hader">
+        <div class="card-header">
           <img src="${flags.svg}" alt="${
         name.official
       }"  width="100" height="50">
@@ -41,7 +41,7 @@ function createListMarkup(data) {
   return data
     .map(
       ({ name, flags }) =>
-        `<li class="list-item">
+        `<li class="list-item" data-name="${name.official}">
                 <img src="${flags.svg}" alt="${name.official}"  width="40" height="30">
                 <p class="card-title">${name.official}</p>
         </li>`
@@ -64,6 +64,8 @@ function renderMarkup(data) {
     clearMarkup(refs.cardContainer);
     const markup = createListMarkup(data);
     refs.cardList.innerHTML = markup;
+    onListHover();
+    onListClick();
   }
 }
 
@@ -77,7 +79,36 @@ function onFetchError(error) {
   Notiflix.Notify.failure('Oops, there is no country with that name');
 }
 
+// !===================additionally======================
+// Функція що відкриває картку країни при натиснені на елемент списку
+function onListClick() {
+  const listItems = document.querySelectorAll('.list-item');
+  listItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const countryName = item.dataset.name;
+      fetchCountries(countryName).then(data => {
+        clearMarkup(refs.cardList);
+        const markup = createCardMarkup(data);
+        refs.cardContainer.innerHTML = markup;
+      });
+    });
+  });
+}
+
+// Функція ховеру на елемент сторінки
+function onListHover() {
+  const listItems = document.querySelectorAll('.list-item');
+  listItems.forEach(item => {
+    item.addEventListener('mouseover', () => {
+      item.classList.add('hovered');
+    });
+    item.addEventListener('mouseout', () => {
+      item.classList.remove('hovered');
+    });
+  });
+}
 // !===================
+
 function onInput(evt) {
   evt.preventDefault();
 
